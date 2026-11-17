@@ -26,4 +26,8 @@
 ## 🏆 Also works with [ModMenu](https://modrinth.com/mod/modmenu)!
 
 * The **ModMenu** compatibility is **optional**
-* In the menu, player can select and arrange additional languages.
+* In the menu, player can select and arrange additional languages
+* The search also works by **[language code](https://minecraft.fandom.com/wiki/Language#Languages)**!
+
+
+> 🦉
