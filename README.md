@@ -1,9 +1,29 @@
-# Polyglot
+# 👅 Polyglot
 
-## Setup
+## ☁️️ Abstract
 
-For setup instructions, please see the [Fabric Documentation page](https://docs.fabricmc.net/develop/getting-started/creating-a-project#setting-up) related to the IDE that you are using.
+* Version: **Minecraft Fabric 26.3**
+* Environment: **Client**
+* Functionality: Shows additional item tooltips on configurable languages (no limit), when player is holding a key (default: `Left Shift`). The mod only uses the loaded localization files, no custom translates.
 
-## License
+## 🖋 Config
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+* Example `polyglot.json`:
+```json
+{
+  "additionalLanguages": [
+    "en_gb",
+    "en_au",
+    "en_ca",
+    "enp",
+    "enws"
+  ]
+}
+```
+* The order matters: tooltips will be displayed in the exact order they are listed above
+* There can be as many languages as player wants
+
+## 🏆 Also works with [ModMenu](https://modrinth.com/mod/modmenu)!
+
+* The **ModMenu** compatibility is **optional**
+* In the menu, player can select and arrange additional languages.

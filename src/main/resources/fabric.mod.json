@@ -1,38 +1,34 @@
 {
-	"schemaVersion": 1,
-	"id": "polyglot",
-	"version": "${version}",
-	"name": "Polyglot",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/polyglot/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"net.mondless.Polyglot"
-		],
-		"client": [
-			"net.mondless.client.PolyglotClient"
-		]
-	},
-	"mixins": [
-		"polyglot.mixins.json",
-		{
-			"config": "polyglot.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.20.1",
-		"minecraft": "~26.3",
-		"java": ">=25",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "polyglot",
+  "version": "${version}",
+  "name": "Polyglot",
+  "description": "Shows additional item tooltips in the languages selected by the player.",
+  "authors": ["Mondless"],
+  "contact": {},
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.mondless.polyglot.PolyglotClient"
+    ],
+    "modmenu": [
+      "net.mondless.polyglot.compat.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    {
+      "config": "polyglot.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
 }
