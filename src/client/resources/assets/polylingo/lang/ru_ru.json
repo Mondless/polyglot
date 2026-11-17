@@ -1,10 +1,12 @@
 {
   "key.category.polylingo.general": "Polylingo",
   "key.polylingo.show_translations": "Показывать дополнительные переводы предметов",
+
   "screen.polylingo.title": "Настройки Polylingo",
-  "screen.polylingo.description": "Выберите дополнительные языки и порядок их отображения.",
+  "screen.polylingo.description": "Выбери дополнительные языки и порядок их отображения.",
   "screen.polylingo.add_language": "Язык для добавления",
   "screen.polylingo.add": "Добавить",
+  "screen.polylingo.search_hint": "Поиск",
   "screen.polylingo.empty": "Дополнительные языки не выбраны.",
   "screen.polylingo.missing": "Недоступный язык",
   "screen.polylingo.page": "Страница %s / %s",

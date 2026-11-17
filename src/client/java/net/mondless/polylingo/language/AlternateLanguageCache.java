@@ -7,7 +7,6 @@ import net.minecraft.client.resources.language.LanguageInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Builds secondary ClientLanguage instances directly from the active resource packs. */
 public final class AlternateLanguageCache {
     private static final Map<String, ClientLanguage> CACHE = new HashMap<>();
 

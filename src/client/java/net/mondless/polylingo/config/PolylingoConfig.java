@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-/** Client-only user configuration. The values are vanilla/Fabric language IDs, never display names. */
 public final class PolylingoConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger("Polylingo");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
