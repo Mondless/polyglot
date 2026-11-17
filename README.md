@@ -1,4 +1,4 @@
-# 👅 Polyglot
+# 👅 Polylingo
 
 ## ☁️️ Abstract
 
@@ -8,7 +8,7 @@
 
 ## 🖋 Config
 
-* Example `polyglot.json`:
+* Example `polylingo.json`:
 ```json
 {
   "additionalLanguages": [

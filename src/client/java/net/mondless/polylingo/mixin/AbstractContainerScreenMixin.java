@@ -1,10 +1,10 @@
-package net.mondless.polyglot.mixin;
+package net.mondless.polylingo.mixin;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import net.mondless.polyglot.utils.PolyglotTooltipContext;
+import net.mondless.polylingo.utils.PolylingoTooltipContext;
 import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,9 +28,9 @@ public abstract class AbstractContainerScreenMixin {
             at = @At("HEAD"),
             require = 1
     )
-    private void polyglot$captureHoveredStack(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
+    private void polylingo$captureHoveredStack(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
         if (this.menu.getCarried().isEmpty() && this.hoveredSlot != null && this.hoveredSlot.hasItem()) {
-            ((PolyglotTooltipContext) graphics).polyglot$setPendingItemStack(this.hoveredSlot.getItem().copy());
+            ((PolylingoTooltipContext) graphics).polylingo$setPendingItemStack(this.hoveredSlot.getItem().copy());
         }
     }
 }

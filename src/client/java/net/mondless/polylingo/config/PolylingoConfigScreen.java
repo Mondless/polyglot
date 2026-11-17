@@ -1,4 +1,4 @@
-package net.mondless.polyglot.config;
+package net.mondless.polylingo.config;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /** A small dependency-free Mod Menu screen with an ordered language list. */
-public final class PolyglotConfigScreen extends Screen {
+public final class PolylingoConfigScreen extends Screen {
     private static final int ROWS_PER_PAGE = 6;
 
     private final Screen parent;
@@ -22,10 +22,10 @@ public final class PolyglotConfigScreen extends Screen {
     private String selectedToAdd = "en_us";
     private int page;
 
-    public PolyglotConfigScreen(Screen parent) {
-        super(Component.translatable("screen.polyglot.title"));
+    public PolylingoConfigScreen(Screen parent) {
+        super(Component.translatable("screen.polylingo.title"));
         this.parent = parent;
-        this.working.addAll(PolyglotConfig.getAdditionalLanguages());
+        this.working.addAll(PolylingoConfig.getAdditionalLanguages());
     }
 
     @Override
@@ -51,11 +51,11 @@ public final class PolyglotConfigScreen extends Screen {
                 .withValues(this.availableLanguageIds)
                 .displayOnlyValue()
                 .create(selectorX, 66, selectorWidth, 20,
-                        Component.translatable("screen.polyglot.add_language"),
+                        Component.translatable("screen.polylingo.add_language"),
                         (button, value) -> this.selectedToAdd = value);
         addRenderableWidget(languageSelector);
 
-        addRenderableWidget(Button.builder(Component.translatable("screen.polyglot.add"), button -> {
+        addRenderableWidget(Button.builder(Component.translatable("screen.polylingo.add"), button -> {
             if (!this.working.contains(this.selectedToAdd)) {
                 this.working.add(this.selectedToAdd);
                 this.page = Math.max(0, (this.working.size() - 1) / ROWS_PER_PAGE);
@@ -81,7 +81,7 @@ public final class PolyglotConfigScreen extends Screen {
                 addRenderableWidget(Button.builder(Component.literal("↓"), button -> move(itemIndex, itemIndex + 1))
                         .bounds(controlsRight - 76, y - 2, 24, 20).build());
             }
-            addRenderableWidget(Button.builder(Component.translatable("screen.polyglot.remove"), button -> {
+            addRenderableWidget(Button.builder(Component.translatable("screen.polylingo.remove"), button -> {
                 this.working.remove(itemIndex);
                 rebuildWidgets();
             }).bounds(controlsRight - 48, y - 2, 70, 20).build());
@@ -99,12 +99,12 @@ public final class PolyglotConfigScreen extends Screen {
             }).bounds(center + 40, navY, 24, 20).build());
         }
 
-        addRenderableWidget(Button.builder(Component.translatable("screen.polyglot.cancel"), button ->
+        addRenderableWidget(Button.builder(Component.translatable("screen.polylingo.cancel"), button ->
                 Minecraft.getInstance().setScreenAndShow(this.parent)
         ).bounds(center - 154, this.height - 32, 150, 20).build());
 
-        addRenderableWidget(Button.builder(Component.translatable("screen.polyglot.done"), button -> {
-            PolyglotConfig.setAdditionalLanguages(this.working);
+        addRenderableWidget(Button.builder(Component.translatable("screen.polylingo.done"), button -> {
+            PolylingoConfig.setAdditionalLanguages(this.working);
             Minecraft.getInstance().setScreenAndShow(this.parent);
         }).bounds(center + 4, this.height - 32, 150, 20).build());
     }
@@ -122,7 +122,7 @@ public final class PolyglotConfigScreen extends Screen {
     private Component languageLabel(String languageId) {
         LanguageInfo info = Minecraft.getInstance().getLanguageManager().getLanguage(languageId);
         return info == null
-                ? Component.literal(languageId + " (" + Component.translatable("screen.polyglot.missing").getString() + ")")
+                ? Component.literal(languageId + " (" + Component.translatable("screen.polylingo.missing").getString() + ")")
                 : info.toComponent();
     }
 
@@ -130,13 +130,13 @@ public final class PolyglotConfigScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         graphics.centeredText(this.font, this.title, this.width / 2, 25, 0xFFFFFFFF);
-        graphics.centeredText(this.font, Component.translatable("screen.polyglot.description"), this.width / 2, 43, 0xFFAAAAAA);
+        graphics.centeredText(this.font, Component.translatable("screen.polylingo.description"), this.width / 2, 43, 0xFFAAAAAA);
 
         int center = this.width / 2;
-        graphics.text(this.font, Component.translatable("screen.polyglot.add_language"), center - 190, 54, 0xFFE0E0E0);
+        graphics.text(this.font, Component.translatable("screen.polylingo.add_language"), center - 190, 54, 0xFFE0E0E0);
 
         if (this.working.isEmpty()) {
-            graphics.centeredText(this.font, Component.translatable("screen.polyglot.empty"), center, 128, 0xFFAAAAAA);
+            graphics.centeredText(this.font, Component.translatable("screen.polylingo.empty"), center, 128, 0xFFAAAAAA);
         } else {
             int start = this.page * ROWS_PER_PAGE;
             int end = Math.min(this.working.size(), start + ROWS_PER_PAGE);
@@ -150,7 +150,7 @@ public final class PolyglotConfigScreen extends Screen {
         int pageCount = Math.max(1, (this.working.size() + ROWS_PER_PAGE - 1) / ROWS_PER_PAGE);
         if (pageCount > 1) {
             graphics.centeredText(this.font,
-                    Component.translatable("screen.polyglot.page", this.page + 1, pageCount),
+                    Component.translatable("screen.polylingo.page", this.page + 1, pageCount),
                     center, 275, 0xFFAAAAAA);
         }
     }

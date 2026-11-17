@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "net.mondless.polyglot.mixin",
+  "package": "net.mondless.polylingo.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
     "GuiGraphicsExtractorMixin",

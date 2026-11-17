@@ -1,4 +1,4 @@
-package net.mondless.polyglot.config;
+package net.mondless.polylingo.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,14 +23,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /** Client-only user configuration. The values are vanilla/Fabric language IDs, never display names. */
-public final class PolyglotConfig {
-    private static final Logger LOGGER = LoggerFactory.getLogger("Polyglot");
+public final class PolylingoConfig {
+    private static final Logger LOGGER = LoggerFactory.getLogger("Polylingo");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-    private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("polyglot.json");
+    private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("polylingo.json");
 
     private static volatile List<String> additionalLanguages = List.of();
 
-    private PolyglotConfig() {
+    private PolylingoConfig() {
     }
 
     public static void load() {
@@ -60,7 +60,7 @@ public final class PolyglotConfig {
         } catch (IOException | JsonParseException | IllegalStateException exception) {
             // keep a malformed file untouched so player can repair it manually
             additionalLanguages = List.of();
-            LOGGER.error("Could not read config file {}. Polyglot is using an empty language list.", FILE, exception);
+            LOGGER.error("Could not read config file {}. Polylingo is using an empty language list.", FILE, exception);
         }
     }
 

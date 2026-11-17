@@ -1,4 +1,4 @@
-package net.mondless.polyglot.mixin;
+package net.mondless.polylingo.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -16,10 +16,10 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
-import net.mondless.polyglot.PolyglotClient;
-import net.mondless.polyglot.config.PolyglotConfig;
-import net.mondless.polyglot.language.AlternateLanguageCache;
-import net.mondless.polyglot.utils.PolyglotTooltipContext;
+import net.mondless.polylingo.PolylingoClient;
+import net.mondless.polylingo.config.PolylingoConfig;
+import net.mondless.polylingo.language.AlternateLanguageCache;
+import net.mondless.polylingo.utils.PolylingoTooltipContext;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Mixin(GuiGraphicsExtractor.class)
-public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContext {
+public abstract class GuiGraphicsExtractorMixin implements PolylingoTooltipContext {
     @Unique
     private static final int POLYGLOT_GAP = 2;
     @Unique
@@ -41,21 +41,21 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     private static final Pattern POLYGLOT_RAW_ID = Pattern.compile("(?i)^#?[a-z0-9_.-]+:[a-z0-9_./-]+$");
 
     @Unique
-    private ItemStack polyglot$pendingItemStack = ItemStack.EMPTY;
+    private ItemStack polylingo$pendingItemStack = ItemStack.EMPTY;
     @Unique
-    private boolean polyglot$renderingSecondary = false;
+    private boolean polylingo$renderingSecondary = false;
 
 //    @Inject(
 //            method = "setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;II)V",
 //            at = @At("HEAD")
 //    )
-//    private void polyglot$captureStack(Font font, ItemStack stack, int mouseX, int mouseY, CallbackInfo callbackInfo) {
-//        this.polyglot$pendingItemStack = stack.copy();
+//    private void polylingo$captureStack(Font font, ItemStack stack, int mouseX, int mouseY, CallbackInfo callbackInfo) {
+//        this.polylingo$pendingItemStack = stack.copy();
 //    }
 
     @Override
-    public void polyglot$setPendingItemStack(ItemStack stack) {
-        this.polyglot$pendingItemStack = stack;
+    public void polylingo$setPendingItemStack(ItemStack stack) {
+        this.polylingo$pendingItemStack = stack;
     }
 
     @Inject(
@@ -63,7 +63,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
             at = @At("TAIL"),
             require = 1
     )
-    private void polyglot$renderSecondaryTooltips(
+    private void polylingo$renderSecondaryTooltips(
             Font font,
             List<ClientTooltipComponent> vanillaLines,
             int mouseX,
@@ -73,20 +73,20 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
             boolean extraSpaceAfterFirstLine,
             CallbackInfo callbackInfo
     ) {
-        if (this.polyglot$renderingSecondary) {
+        if (this.polylingo$renderingSecondary) {
             return;
         }
 
-        ItemStack stack = this.polyglot$pendingItemStack;
-        this.polyglot$pendingItemStack = ItemStack.EMPTY;
+        ItemStack stack = this.polylingo$pendingItemStack;
+        this.polylingo$pendingItemStack = ItemStack.EMPTY;
 
-        var key = KeyMappingHelper.getBoundKeyOf(PolyglotClient.SHOW_TRANSLATIONS);
+        var key = KeyMappingHelper.getBoundKeyOf(PolylingoClient.SHOW_TRANSLATIONS);
         var isKeyDown = key.getType() == InputConstants.Type.KEYBOARD && InputConstants.isKeyDown(key.getValue());
 
 //        System.out.println((key.getType() == InputConstants.Type.KEYBOARD) + " " + InputConstants.isKeyDown(key.getValue()));
 
-        if (stack.isEmpty() || PolyglotClient.SHOW_TRANSLATIONS == null || !isKeyDown) {
-//            System.out.println(stack.isEmpty() + " " + (PolyglotClient.SHOW_TRANSLATIONS == null) + " " + (!PolyglotClient.SHOW_TRANSLATIONS.isDown()));
+        if (stack.isEmpty() || PolylingoClient.SHOW_TRANSLATIONS == null || !isKeyDown) {
+//            System.out.println(stack.isEmpty() + " " + (PolylingoClient.SHOW_TRANSLATIONS == null) + " " + (!PolylingoClient.SHOW_TRANSLATIONS.isDown()));
             return;
         }
 
@@ -95,7 +95,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
         List<SecondaryPanel> panels = new ArrayList<>();
         Set<String> usedIds = new HashSet<>();
 
-        for (String languageId : PolyglotConfig.getAdditionalLanguages()) {
+        for (String languageId : PolylingoConfig.getAdditionalLanguages()) {
             if (languageId.equals(activeLanguage) || !usedIds.add(languageId)) {
                 continue;
             }
@@ -105,7 +105,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
                 continue;
             }
 
-            SecondaryPanel panel = polyglot$createPanel(stack, font, language, extraSpaceAfterFirstLine);
+            SecondaryPanel panel = polylingo$createPanel(stack, font, language, extraSpaceAfterFirstLine);
             if (panel != null) {
                 panels.add(panel);
             }
@@ -118,17 +118,17 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
         GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
         int screenWidth = graphics.guiWidth();
         int screenHeight = graphics.guiHeight();
-        int mainWidth = polyglot$measureWidth(vanillaLines, font);
-        int mainHeight = polyglot$measureHeight(vanillaLines, font, extraSpaceAfterFirstLine);
+        int mainWidth = polylingo$measureWidth(vanillaLines, font);
+        int mainHeight = polylingo$measureHeight(vanillaLines, font, extraSpaceAfterFirstLine);
         Vector2ic mainPosition = vanillaPositioner.positionTooltip(
                 screenWidth, screenHeight, mouseX, mouseY, mainWidth, mainHeight
         );
 
-        List<PanelPosition> positions = polyglot$layout(
+        List<PanelPosition> positions = polylingo$layout(
                 panels, mainPosition.x(), mainPosition.y(), mainWidth, mainHeight, screenWidth, screenHeight
         );
 
-        this.polyglot$renderingSecondary = true;
+        this.polylingo$renderingSecondary = true;
         try {
             for (int index = 0; index < panels.size(); index++) {
                 SecondaryPanel panel = panels.get(index);
@@ -146,12 +146,12 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
                 );
             }
         } finally {
-            this.polyglot$renderingSecondary = false;
+            this.polylingo$renderingSecondary = false;
         }
     }
 
     @Unique
-    private static SecondaryPanel polyglot$createPanel(
+    private static SecondaryPanel polylingo$createPanel(
             ItemStack stack, Font font, ClientLanguage targetLanguage, boolean extraSpaceAfterFirstLine
     ) {
         Language previousLanguage = Language.getInstance();
@@ -162,13 +162,13 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
 
             for (int index = 0; index < itemLines.size(); index++) {
                 Component line = itemLines.get(index);
-                if (polyglot$hasMissingTranslation(line, targetLanguage)) {
+                if (polylingo$hasMissingTranslation(line, targetLanguage)) {
                     continue;
                 }
 
                 // 1st row - the item name
                 if (index > 0) {
-//                    if (!polyglot$containsTranslation(line) || polyglot$isTechnicalLine(line.getString())) {
+//                    if (!polylingo$containsTranslation(line) || polylingo$isTechnicalLine(line.getString())) {
 //                        continue;
 //                    }
 
@@ -176,7 +176,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
                         if (renderedLines.isEmpty() || itemLines.get(index - 1).getString().isBlank()) {
                             continue;
                         }
-                    } else if (!polyglot$containsTranslation(line) || polyglot$isTechnicalLine(line.getString())) {
+                    } else if (!polylingo$containsTranslation(line) || polylingo$isTechnicalLine(line.getString())) {
                         continue;
                     }
                 }
@@ -199,8 +199,8 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
             if (renderedLines.isEmpty()) {
                 return null;
             }
-            return new SecondaryPanel(List.copyOf(renderedLines), polyglot$measureWidth(renderedLines, font),
-                    polyglot$measureHeight(renderedLines, font, extraSpaceAfterFirstLine));
+            return new SecondaryPanel(List.copyOf(renderedLines), polylingo$measureWidth(renderedLines, font),
+                    polylingo$measureHeight(renderedLines, font, extraSpaceAfterFirstLine));
         } catch (RuntimeException exception) {
             return null;
         } finally {
@@ -209,12 +209,12 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     }
 
     @Unique
-    private static boolean polyglot$containsTranslation(Component component) {
+    private static boolean polylingo$containsTranslation(Component component) {
         if (component.getContents() instanceof TranslatableContents) {
             return true;
         }
         for (Component sibling : component.getSiblings()) {
-            if (polyglot$containsTranslation(sibling)) {
+            if (polylingo$containsTranslation(sibling)) {
                 return true;
             }
         }
@@ -222,20 +222,20 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     }
 
     @Unique
-    private static boolean polyglot$hasMissingTranslation(Component component, Language language) {
+    private static boolean polylingo$hasMissingTranslation(Component component, Language language) {
         if (component.getContents() instanceof TranslatableContents translatable) {
             if (!language.has(translatable.getKey())) {
                 return true;
             }
             for (Object argument : translatable.getArgs()) {
                 if (argument instanceof Component argumentComponent
-                        && polyglot$hasMissingTranslation(argumentComponent, language)) {
+                        && polylingo$hasMissingTranslation(argumentComponent, language)) {
                     return true;
                 }
             }
         }
         for (Component sibling : component.getSiblings()) {
-            if (polyglot$hasMissingTranslation(sibling, language)) {
+            if (polylingo$hasMissingTranslation(sibling, language)) {
                 return true;
             }
         }
@@ -243,7 +243,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     }
 
     @Unique
-    private static boolean polyglot$isTechnicalLine(String rawText) {
+    private static boolean polylingo$isTechnicalLine(String rawText) {
         String text = rawText.trim();
         if (text.isEmpty() || POLYGLOT_RAW_ID.matcher(text).matches()) {
             return true;
@@ -266,7 +266,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     }
 
     @Unique
-    private static int polyglot$measureWidth(List<ClientTooltipComponent> lines, Font font) {
+    private static int polylingo$measureWidth(List<ClientTooltipComponent> lines, Font font) {
         int maximum = 0;
         for (ClientTooltipComponent line : lines) {
             maximum = Math.max(maximum, line.getWidth(font));
@@ -275,7 +275,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     }
 
     @Unique
-    private static int polyglot$measureHeight(List<ClientTooltipComponent> lines, Font font, boolean extraSpaceAfterFirstLine) {
+    private static int polylingo$measureHeight(List<ClientTooltipComponent> lines, Font font, boolean extraSpaceAfterFirstLine) {
         int height = 8;
         for (ClientTooltipComponent line : lines) {
             height += line.getHeight(font);
@@ -287,7 +287,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     }
 
     //        @Unique
-//        private static List<PanelPosition> polyglot$layout(
+//        private static List<PanelPosition> polylingo$layout(
 //                List<SecondaryPanel> panels,
 //                int mainX,
 //                int mainY,
@@ -306,7 +306,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
 //            if (mainX + mainWidth + POLYGLOT_GAP + groupWidth <= screenWidth - POLYGLOT_MARGIN) {
 //                int x = mainX + mainWidth + POLYGLOT_GAP;
 //                for (SecondaryPanel panel : panels) {
-//                    int y = polyglot$clamp(mainY, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenHeight - panel.height() - POLYGLOT_MARGIN));
+//                    int y = polylingo$clamp(mainY, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenHeight - panel.height() - POLYGLOT_MARGIN));
 //                    result.add(new PanelPosition(x, y));
 //                    x += panel.width() + POLYGLOT_GAP;
 //                }
@@ -317,7 +317,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
 //            if (mainX - POLYGLOT_GAP - groupWidth >= POLYGLOT_MARGIN) {
 //                int x = mainX - POLYGLOT_GAP - groupWidth;
 //                for (SecondaryPanel panel : panels) {
-//                    int y = polyglot$clamp(mainY, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenHeight - panel.height() - POLYGLOT_MARGIN));
+//                    int y = polylingo$clamp(mainY, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenHeight - panel.height() - POLYGLOT_MARGIN));
 //                    result.add(new PanelPosition(x, y));
 //                    x += panel.width() + POLYGLOT_GAP;
 //                }
@@ -328,7 +328,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
 //            if (mainY + mainHeight + POLYGLOT_GAP + groupHeight <= screenHeight - POLYGLOT_MARGIN) {
 //                int y = mainY + mainHeight + POLYGLOT_GAP;
 //                for (SecondaryPanel panel : panels) {
-//                    int x = polyglot$clamp(mainX, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenWidth - panel.width() - POLYGLOT_MARGIN));
+//                    int x = polylingo$clamp(mainX, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenWidth - panel.width() - POLYGLOT_MARGIN));
 //                    result.add(new PanelPosition(x, y));
 //                    y += panel.height() + POLYGLOT_GAP;
 //                }
@@ -339,7 +339,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
 //            if (mainY - POLYGLOT_GAP - groupHeight >= POLYGLOT_MARGIN) {
 //                int y = mainY - POLYGLOT_GAP - groupHeight;
 //                for (SecondaryPanel panel : panels) {
-//                    int x = polyglot$clamp(mainX, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenWidth - panel.width() - POLYGLOT_MARGIN));
+//                    int x = polylingo$clamp(mainX, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenWidth - panel.width() - POLYGLOT_MARGIN));
 //                    result.add(new PanelPosition(x, y));
 //                    y += panel.height() + POLYGLOT_GAP;
 //                }
@@ -349,15 +349,15 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
 //            // Extremely small windows: best-effort placement, clamped to the visible GUI area.
 //            int y = POLYGLOT_MARGIN;
 //            for (SecondaryPanel panel : panels) {
-//                int x = polyglot$clamp(mainX, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenWidth - panel.width() - POLYGLOT_MARGIN));
-//                int safeY = polyglot$clamp(y, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenHeight - panel.height() - POLYGLOT_MARGIN));
+//                int x = polylingo$clamp(mainX, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenWidth - panel.width() - POLYGLOT_MARGIN));
+//                int safeY = polylingo$clamp(y, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenHeight - panel.height() - POLYGLOT_MARGIN));
 //                result.add(new PanelPosition(x, safeY));
 //                y = safeY + panel.height() + POLYGLOT_GAP;
 //            }
 //            return result;
 //        }
     @Unique
-    private static List<PanelPosition> polyglot$layout(
+    private static List<PanelPosition> polylingo$layout(
             List<SecondaryPanel> panels,
             int mainX,
             int mainY,
@@ -377,7 +377,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
         List<List<SecondaryPanel>> columns = List.of();
 
         for (int cols = 1; cols <= count; cols++) {
-            List<List<SecondaryPanel>> candidate = polyglot$buildColumns(panels, cols);
+            List<List<SecondaryPanel>> candidate = polylingo$buildColumns(panels, cols);
             int maxColHeight = candidate.stream()
                     .mapToInt(col -> col.stream().mapToInt(SecondaryPanel::height).sum()
                             + POLYGLOT_GAP * Math.max(0, col.size() - 1))
@@ -415,8 +415,8 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
                 ? mainX + mainWidth + POLYGLOT_GAP
                 : mainX - POLYGLOT_GAP - totalGridWidth;
 
-        startX = polyglot$clamp(startX, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenWidth - totalGridWidth - POLYGLOT_MARGIN));
-        int startY = polyglot$clamp(mainY, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenHeight - totalGridHeight - POLYGLOT_MARGIN));
+        startX = polylingo$clamp(startX, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenWidth - totalGridWidth - POLYGLOT_MARGIN));
+        int startY = polylingo$clamp(mainY, POLYGLOT_MARGIN, Math.max(POLYGLOT_MARGIN, screenHeight - totalGridHeight - POLYGLOT_MARGIN));
 
         List<PanelPosition> result = new ArrayList<>(count);
         int currentX = startX;
@@ -435,7 +435,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     }
 
     @Unique
-    private static List<List<SecondaryPanel>> polyglot$buildColumns(List<SecondaryPanel> panels, int cols) {
+    private static List<List<SecondaryPanel>> polylingo$buildColumns(List<SecondaryPanel> panels, int cols) {
         int total = panels.size();
         int actualCols = Math.min(cols, total);
         List<List<SecondaryPanel>> result = new ArrayList<>(actualCols);
@@ -453,7 +453,7 @@ public abstract class GuiGraphicsExtractorMixin implements PolyglotTooltipContex
     }
 
     @Unique
-    private static int polyglot$clamp(int value, int minimum, int maximum) {
+    private static int polylingo$clamp(int value, int minimum, int maximum) {
         return Math.max(minimum, Math.min(value, maximum));
     }
 

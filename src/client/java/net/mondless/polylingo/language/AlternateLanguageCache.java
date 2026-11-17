@@ -1,9 +1,8 @@
-package net.mondless.polyglot.language;
+package net.mondless.polylingo.language;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.LanguageInfo;
-import net.minecraft.locale.Language;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,0 +1,14 @@
+{
+  "key.category.polylingo.general": "polylingo",
+  "key.polylingo.show_translations": "Show additional item tooltips",
+  "screen.polylingo.title": "polylingo settings",
+  "screen.polylingo.description": "Choose the extra languages and their display order.",
+  "screen.polylingo.add_language": "Language to add",
+  "screen.polylingo.add": "Add",
+  "screen.polylingo.empty": "No additional languages selected.",
+  "screen.polylingo.missing": "Unavailable language",
+  "screen.polylingo.page": "Page %s / %s",
+  "screen.polylingo.cancel": "Cancel",
+  "screen.polylingo.done": "Save",
+  "screen.polylingo.remove": "Remove"
+}

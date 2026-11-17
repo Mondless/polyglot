@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "polyglot",
+  "id": "polylingo",
   "version": "${version}",
-  "name": "Polyglot",
+  "name": "Polylingo",
   "description": "Shows additional item tooltips in the languages selected by the player.",
   "authors": ["Mondless"],
   "contact": {},
@@ -10,15 +10,15 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "net.mondless.polyglot.PolyglotClient"
+      "net.mondless.polylingo.PolylingoClient"
     ],
     "modmenu": [
-      "net.mondless.polyglot.compat.ModMenuIntegration"
+      "net.mondless.polylingo.compat.ModMenuIntegration"
     ]
   },
   "mixins": [
     {
-      "config": "polyglot.client.mixins.json",
+      "config": "polylingo.client.mixins.json",
       "environment": "client"
     }
   ],
