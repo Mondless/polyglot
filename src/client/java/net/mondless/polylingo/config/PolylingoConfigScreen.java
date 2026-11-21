@@ -16,13 +16,14 @@ import org.jspecify.annotations.NonNull;
 import java.util.*;
 
 public final class PolylingoConfigScreen extends Screen {
-    private static final int ROWS_PER_PAGE = 6;
+    private static final int ROWS_PER_PAGE = 5;
     private static final int MAX_SUGGESTIONS = 7;
     private static final int SUGGESTION_ROW_HEIGHT = 18;
     private static final int SCROLLBAR_HIT_WIDTH = 8;
 
     private final Screen parent;
     private final List<String> working = new ArrayList<>();
+    private PolylingoConfig.DisplayMode workingMode;
     private List<String> availableLanguageIds = List.of();
     private List<String> filteredSuggestions = List.of();
 
@@ -43,6 +44,7 @@ public final class PolylingoConfigScreen extends Screen {
         super(Component.translatable("screen.polylingo.title"));
         this.parent = parent;
         this.working.addAll(PolylingoConfig.getAdditionalLanguages());
+        this.workingMode = PolylingoConfig.getDisplayMode();
     }
 
     @Override
@@ -127,15 +129,29 @@ public final class PolylingoConfigScreen extends Screen {
         }
 
         if (pageCount > 1) {
-            int navY = 270;
-            addRenderableWidget(Button.builder(Component.literal("‹"), _ -> {
-                this.page = Math.max(0, this.page - 1);
-                rebuildWidgets();
-            }).bounds(center - 64, navY, 24, 20).build());
-            addRenderableWidget(Button.builder(Component.literal("›"), _ -> {
-                this.page = Math.min(pageCount - 1, this.page + 1);
-                rebuildWidgets();
-            }).bounds(center + 40, navY, 24, 20).build());
+            int modeY = this.height - 60;
+
+            addRenderableWidget(Button.builder(modeButtonLabel(), button -> {
+                this.workingMode = this.workingMode == PolylingoConfig.DisplayMode.SLIDER
+                        ? PolylingoConfig.DisplayMode.PANELS
+                        : PolylingoConfig.DisplayMode.SLIDER;
+
+                button.setMessage(modeButtonLabel());
+            }).bounds(center - 110, modeY, 220, 20).build());
+
+            if (pageCount > 1) {
+                int navY = modeY - 27;
+
+                addRenderableWidget(Button.builder(Component.literal("‹"), _ -> {
+                    this.page = Math.max(0, this.page - 1);
+                    rebuildWidgets();
+                }).bounds(center - 64, navY, 24, 20).build());
+
+                addRenderableWidget(Button.builder(Component.literal("›"), _ -> {
+                    this.page = Math.min(pageCount - 1, this.page + 1);
+                    rebuildWidgets();
+                }).bounds(center + 40, navY, 24, 20).build());
+            }
         }
 
         addRenderableWidget(Button.builder(Component.translatable("screen.polylingo.cancel"), _ ->
@@ -143,16 +159,11 @@ public final class PolylingoConfigScreen extends Screen {
         ).bounds(center - 154, this.height - 32, 150, 20).build());
 
         addRenderableWidget(Button.builder(Component.translatable("screen.polylingo.done"), _ -> {
-            PolylingoConfig.setAdditionalLanguages(this.working);
+            PolylingoConfig.setSettings(this.working, this.workingMode);
             Minecraft.getInstance().setScreenAndShow(this.parent);
         }).bounds(center + 4, this.height - 32, 150, 20).build());
     }
 
-    /**
-     * Matches every query fragment against any word in the language name or ID.
-     * For example, "ру дореф" matches "Русский дореформенный", while "rpr"
-     * matches the language ID even if that ID is not shown in the language name.
-     */
     private void updateSuggestions(String query) {
         List<String> queryTokens = searchTokens(query);
 
@@ -351,6 +362,14 @@ public final class PolylingoConfigScreen extends Screen {
         this.draggingSuggestionScrollbar = false;
 
         rebuildWidgets();
+    }
+
+    private Component modeButtonLabel() {
+        var modeKey = this.workingMode == PolylingoConfig.DisplayMode.SLIDER
+                ? "screen.polylingo.mode.slider"
+                : "screen.polylingo.mode.panels";
+
+        return Component.translatable("screen.polylingo.mode", Component.translatable(modeKey));
     }
 
     @Override

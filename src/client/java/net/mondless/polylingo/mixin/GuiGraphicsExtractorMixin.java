@@ -3,6 +3,7 @@ package net.mondless.polylingo.mixin;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -19,7 +20,8 @@ import net.minecraft.world.item.ItemStack;
 import net.mondless.polylingo.PolylingoClient;
 import net.mondless.polylingo.config.PolylingoConfig;
 import net.mondless.polylingo.language.AlternateLanguageCache;
-import net.mondless.polylingo.utils.PolylingoTooltipContext;
+import net.mondless.polylingo.utils.SliderDotsComponent;
+import net.mondless.polylingo.utils.TooltipContext;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,7 +34,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 @Mixin(GuiGraphicsExtractor.class)
-public abstract class GuiGraphicsExtractorMixin implements PolylingoTooltipContext {
+public abstract class GuiGraphicsExtractorMixin implements TooltipContext {
     @Unique
     private static final int POLYGLOT_GAP = 2;
     @Unique
@@ -58,22 +60,68 @@ public abstract class GuiGraphicsExtractorMixin implements PolylingoTooltipConte
         this.polylingo$pendingItemStack = stack;
     }
 
-    @Inject(
-            method = "tooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Z)V",
+    @Inject(method = "tooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Z)V",
+            at = @At("HEAD"),
+            cancellable = true,
+            require = 1)
+    private void polylingo$renderSliderTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo,
+                                               ClientTooltipPositioner positioner, Identifier style,
+                                               boolean extraSpaceAfterFirstLine, CallbackInfo callbackInfo) {
+        if (this.polylingo$renderingSecondary
+                || PolylingoConfig.getDisplayMode() != PolylingoConfig.DisplayMode.SLIDER) {
+            return;
+        }
+
+        var stack = this.polylingo$pendingItemStack;
+        this.polylingo$pendingItemStack = ItemStack.EMPTY;
+
+        if (stack.isEmpty() || !PolylingoClient.isShowTranslationsDown()) {
+            return;
+        }
+
+        List<String> languageIds = PolylingoClient.getSliderLanguageIds();
+
+        if (languageIds.isEmpty()) {
+            return;
+        }
+
+        int selectedIndex = PolylingoClient.getSliderSelection(languageIds.size());
+
+        ClientLanguage targetLanguage = AlternateLanguageCache.get(
+                languageIds.get(selectedIndex)
+        );
+
+        if (targetLanguage == null) {
+            return;
+        }
+
+        var sliderLines = polylingo$createSliderTooltip(stack, targetLanguage, selectedIndex, languageIds.size(), font);
+
+        if (sliderLines == null || sliderLines.isEmpty()) {
+            return;
+        }
+
+        var graphics = (GuiGraphicsExtractor) (Object) this;
+        this.polylingo$renderingSecondary = true;
+
+        try {
+            graphics.tooltip(font, sliderLines, xo, yo, positioner,
+                    style, extraSpaceAfterFirstLine);
+        } finally {
+            this.polylingo$renderingSecondary = false;
+        }
+
+        callbackInfo.cancel();
+    }
+
+    @Inject(method = "tooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;Z)V",
             at = @At("TAIL"),
-            require = 1
-    )
-    private void polylingo$renderSecondaryTooltips(
-            Font font,
-            List<ClientTooltipComponent> vanillaLines,
-            int mouseX,
-            int mouseY,
-            ClientTooltipPositioner vanillaPositioner,
-            Identifier style,
-            boolean extraSpaceAfterFirstLine,
-            CallbackInfo callbackInfo
-    ) {
-        if (this.polylingo$renderingSecondary) {
+            require = 1)
+    private void polylingo$renderSecondaryTooltips(Font font, List<ClientTooltipComponent> lines, int xo, int yo,
+                                                   ClientTooltipPositioner positioner, Identifier style,
+                                                   boolean extraSpaceAfterFirstLine, CallbackInfo callbackInfo) {
+        if (this.polylingo$renderingSecondary
+                || PolylingoConfig.getDisplayMode() == PolylingoConfig.DisplayMode.SLIDER) {
             return;
         }
 
@@ -118,10 +166,10 @@ public abstract class GuiGraphicsExtractorMixin implements PolylingoTooltipConte
         GuiGraphicsExtractor graphics = (GuiGraphicsExtractor) (Object) this;
         int screenWidth = graphics.guiWidth();
         int screenHeight = graphics.guiHeight();
-        int mainWidth = polylingo$measureWidth(vanillaLines, font);
-        int mainHeight = polylingo$measureHeight(vanillaLines, font, extraSpaceAfterFirstLine);
-        Vector2ic mainPosition = vanillaPositioner.positionTooltip(
-                screenWidth, screenHeight, mouseX, mouseY, mainWidth, mainHeight
+        int mainWidth = polylingo$measureWidth(lines, font);
+        int mainHeight = polylingo$measureHeight(lines, font, extraSpaceAfterFirstLine);
+        Vector2ic mainPosition = positioner.positionTooltip(
+                screenWidth, screenHeight, xo, yo, mainWidth, mainHeight
         );
 
         List<PanelPosition> positions = polylingo$layout(
@@ -138,8 +186,8 @@ public abstract class GuiGraphicsExtractorMixin implements PolylingoTooltipConte
                 graphics.tooltip(
                         font,
                         panel.lines(),
-                        mouseX,
-                        mouseY,
+                        xo,
+                        yo,
                         fixedPositioner,
                         style,
                         extraSpaceAfterFirstLine
@@ -151,9 +199,101 @@ public abstract class GuiGraphicsExtractorMixin implements PolylingoTooltipConte
     }
 
     @Unique
-    private static SecondaryPanel polylingo$createPanel(
-            ItemStack stack, Font font, ClientLanguage targetLanguage, boolean extraSpaceAfterFirstLine
-    ) {
+    private static List<ClientTooltipComponent> polylingo$createSliderTooltip(
+            ItemStack stack, ClientLanguage targetLanguage, int selectedIndex, int languageCount, Font font) {
+        var minecraft = Minecraft.getInstance();
+        var origLanguage = Language.getInstance();
+
+        try {
+            var originalItemLines = Screen.getTooltipFromItem(minecraft, stack);
+            int origTooltipWidth = 0;
+
+            for (var line : originalItemLines) {
+                origTooltipWidth = Math.max(origTooltipWidth,
+                        font.width(origLanguage.getVisualOrder(line)));
+            }
+
+            List<ClientTooltipComponent> originalLines = new ArrayList<>(
+                    originalItemLines.size()
+            );
+
+            for (var line : originalItemLines) {
+                originalLines.add(ClientTooltipComponent.create(origLanguage.getVisualOrder(line)));
+            }
+
+            Language.inject(targetLanguage);
+
+            var translatedItemLines = Screen.getTooltipFromItem(minecraft, stack);
+
+            List<ClientTooltipComponent> result = new ArrayList<>(
+                    Math.max(originalLines.size(), translatedItemLines.size()) + 2
+            );
+
+            int lineCount = Math.max(
+                    originalLines.size(),
+                    translatedItemLines.size()
+            );
+
+            for (int i = 0; i < lineCount; i++) {
+                if (i >= translatedItemLines.size()) {
+                    result.add(originalLines.get(i));
+                    continue;
+                }
+
+                Component translatedLine = translatedItemLines.get(i);
+
+                boolean hasUsableTranslation =
+                        polylingo$containsTranslation(translatedLine)
+                                && !polylingo$hasMissingTranslation(translatedLine, targetLanguage)
+                                && !polylingo$isTechnicalLine(translatedLine.getString());
+
+                if (hasUsableTranslation || i >= originalLines.size()) {
+                    result.add(
+                            ClientTooltipComponent.create(
+                                    targetLanguage.getVisualOrder(translatedLine)
+                            )
+                    );
+                } else {
+                    result.add(originalLines.get(i));
+                }
+            }
+
+            Optional<TooltipComponent> image = stack.getTooltipImage();
+
+            image.ifPresent(tooltipImage ->
+                    result.add(Math.min(1, result.size()), ClientTooltipComponent.create(tooltipImage)));
+
+            var dots = Component.empty();
+
+            for (int index = 0; index < languageCount; index++) {
+                if (index > 0) {
+                    dots.append(Component.literal(" "));
+                }
+
+                dots.append(
+                        Component.literal("●").withStyle(
+                                index == selectedIndex
+                                        ? ChatFormatting.YELLOW
+                                        : ChatFormatting.DARK_GRAY
+                        )
+                );
+            }
+
+//            result.add(ClientTooltipComponent.create(targetLanguage.getVisualOrder(dots)));
+            result.add(new SliderDotsComponent(origTooltipWidth, languageCount, selectedIndex));
+
+            return List.copyOf(result);
+
+        } catch (RuntimeException exception) {
+            return null;
+        } finally {
+            Language.inject(origLanguage);
+        }
+    }
+
+    @Unique
+    private static SecondaryPanel polylingo$createPanel(ItemStack stack, Font font,
+                                                        ClientLanguage targetLanguage, boolean extraSpaceAfterFirstLine) {
         Language previousLanguage = Language.getInstance();
         Language.inject(targetLanguage);
         try {

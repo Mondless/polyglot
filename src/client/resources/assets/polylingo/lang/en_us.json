@@ -1,6 +1,8 @@
 {
   "key.category.polylingo.general": "Polylingo",
   "key.polylingo.show_translations": "Show additional item tooltips",
+  "key.polylingo.slider_prev": "Previous tooltip language",
+  "key.polylingo.slider_next": "Next tooltip language",
 
   "screen.polylingo.title": "Polylingo Settings",
   "screen.polylingo.description": "Choose the extra languages and their display order.",
@@ -12,5 +14,8 @@
   "screen.polylingo.page": "Page %s / %s",
   "screen.polylingo.cancel": "Cancel",
   "screen.polylingo.done": "Save",
-  "screen.polylingo.remove": "Remove"
+  "screen.polylingo.remove": "Remove",
+  "screen.polylingo.mode": "Mode: %s",
+  "screen.polylingo.mode.panels": "Panels",
+  "screen.polylingo.mode.slider": "Slider"
 }

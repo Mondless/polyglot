@@ -1,6 +1,8 @@
 {
   "key.category.polylingo.general": "Polylingo",
   "key.polylingo.show_translations": "Показывать дополнительные переводы предметов",
+  "key.polylingo.slider_prev": "Предыдущий язык подсказки",
+  "key.polylingo.slider_next": "Следующий язык подсказки",
 
   "screen.polylingo.title": "Настройки Polylingo",
   "screen.polylingo.description": "Выбери дополнительные языки и порядок их отображения.",
@@ -12,5 +14,8 @@
   "screen.polylingo.page": "Страница %s / %s",
   "screen.polylingo.cancel": "Отмена",
   "screen.polylingo.done": "Сохранить",
-  "screen.polylingo.remove": "Удалить"
+  "screen.polylingo.remove": "Удалить",
+  "screen.polylingo.mode": "Режим: %s",
+  "screen.polylingo.mode.panels": "Панели",
+  "screen.polylingo.mode.slider": "Слайдер"
 }

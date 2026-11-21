@@ -28,6 +28,7 @@ public final class PolylingoConfig {
     private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("polylingo.json");
 
     private static volatile List<String> additionalLanguages = List.of();
+    private static volatile DisplayMode displayMode = DisplayMode.PANELS;
 
     private PolylingoConfig() {
     }
@@ -56,9 +57,15 @@ public final class PolylingoConfig {
                 }
             }
             additionalLanguages = normalize(loaded);
+            var mode = root.has("mode") && root.get("mode").isJsonPrimitive()
+                    ? root.get("mode").getAsString()
+                    : "panels";
+
+            displayMode = DisplayMode.fromConfig(mode);
         } catch (IOException | JsonParseException | IllegalStateException exception) {
             // keep a malformed file untouched so player can repair it manually
             additionalLanguages = List.of();
+            displayMode = DisplayMode.PANELS;
             LOGGER.error("Could not read config file {}. Polylingo is using an empty language list.", FILE, exception);
         }
     }
@@ -67,8 +74,18 @@ public final class PolylingoConfig {
         return additionalLanguages;
     }
 
+    public static DisplayMode getDisplayMode() {
+        return displayMode;
+    }
+
     public static synchronized void setAdditionalLanguages(Collection<String> languages) {
         additionalLanguages = normalize(languages);
+        saveCurrent();
+    }
+
+    public static synchronized void setSettings(Collection<String> languages, DisplayMode mode) {
+        additionalLanguages = normalize(languages);
+        displayMode = mode == null ? DisplayMode.PANELS : mode;
         saveCurrent();
     }
 
@@ -99,6 +116,7 @@ public final class PolylingoConfig {
             languages.add(id);
         }
         root.add("additionalLanguages", languages);
+        root.addProperty("mode", displayMode.configValue);
 
         try {
             Files.createDirectories(FILE.getParent());
@@ -113,6 +131,24 @@ public final class PolylingoConfig {
             }
         } catch (IOException exception) {
             LOGGER.error("Could not save config file {}.", FILE, exception);
+        }
+    }
+
+    public enum DisplayMode {
+        PANELS("panels"),
+        SLIDER("slider");
+
+        private final String configValue;
+
+        DisplayMode(String configValue) {
+            this.configValue = configValue;
+        }
+
+        private static DisplayMode fromConfig(String value) {
+            if (value != null && value.trim().equalsIgnoreCase("slider")) {
+                return SLIDER;
+            }
+            return PANELS;
         }
     }
 }
